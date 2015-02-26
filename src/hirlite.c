@@ -1,4 +1,5 @@
 #include "hirlite.h"
+#include "rlite.h"
 
 #if IS_PY3K
 static int hirlite_ModuleTraverse(PyObject *m, visitproc visit, void *arg) {
@@ -36,6 +37,14 @@ PyMODINIT_FUNC inithirlite(void)
 #endif
 
 {
+    if (PyType_Ready(&hirlite_RliteType) < 0) {
+#if IS_PY3K
+        return NULL;
+#else
+        return;
+#endif
+    }
+
 #if IS_PY3K
     mod_hirlite = PyModule_Create(&hirlite_ModuleDef);
 #else
@@ -47,6 +56,10 @@ PyMODINIT_FUNC inithirlite(void)
         PyErr_NewException(MOD_HIRLITE ".HirliteError", PyExc_Exception, NULL);
 
     PyModule_AddObject(mod_hirlite, "HirliteError", HIRLITE_STATE->HiErr_Base);
+
+    Py_INCREF(&hirlite_RliteType);
+    PyModule_AddObject(mod_hirlite, "Rlite", (PyObject *)&hirlite_RliteType);
+
 
 #if IS_PY3K
     return mod_hirlite;

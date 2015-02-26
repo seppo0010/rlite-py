@@ -19,9 +19,27 @@ class install_lib(_install_lib.install_lib):
             if self.distribution.has_ext_modules():
                 self.run_command('build_ext')
 
+# To link the extension with the C library, distutils passes the "-lLIBRARY"
+# option to the linker. This makes it go through its library search path. If it
+# finds a shared object of the specified library in one of the system-wide
+# library paths, it will dynamically link it.
+#
+# We want the linker to statically link the version of hirlite that is included
+# with hirlite-py. However, the linker may pick up the shared library version
+# of hirlite, if it is available through one of the system-wide library paths.
+# To prevent this from happening, we use an obfuscated library name such that
+# the only version the linker will be able to find is the right version.
+#
+# This is a terrible hack, but patching distutils to do the right thing for all
+# supported Python versions is worse...
+#
+# Also see: https://github.com/pietern/hiredis-py/issues/15
+lib = ("hirlite_for_hirlite_py", {
+  "sources": glob.glob("vendor/rlite/src/*.c") + glob.glob("vendor/rlite/deps/*.c")})
+
 ext = Extension("hirlite.hirlite",
     sources=glob.glob("src/*.c"),
-    include_dirs=["vendor"])
+    include_dirs=["vendor/rlite/src"])
 
 setup (name='hirlite',
     version=version(),
@@ -32,6 +50,7 @@ setup (name='hirlite',
     keywords=["Rlite"],
     license="BSD",
     packages=["hirlite"],
+    libraries=[lib],
     ext_modules=[ext],
 
     # Override "install_lib" command

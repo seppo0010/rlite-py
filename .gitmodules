@@ -1,0 +1,3 @@
+[submodule "vendor/rlite"]
+	path = vendor/rlite
+	url = git@bitbucket.org:seppo0010/rlite.git
