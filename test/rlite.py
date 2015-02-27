@@ -23,3 +23,7 @@ class RliteTest(TestCase):
 
     def test_error(self):
         self.assertIsInstance(self.rlite.command('set', 'key'), hirlite.HirliteError)
+
+    def test_array(self):
+        self.rlite.command('rpush', 'mylist', '1', '2', '3')
+        self.assertEquals(self.rlite.command('lrange', 'mylist', 0, -1), ['1', '2', '3'])

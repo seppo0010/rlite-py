@@ -155,6 +155,16 @@ static PyObject *replyToPyObject(hirlite_RliteObject *self, rliteReply *reply) {
         Py_DECREF(args);
         return obj;
     }
+    if (reply->type == RLITE_REPLY_ARRAY) {
+        PyObject *obj, *element;
+        size_t i;
+        obj = PyList_New(reply->elements);
+        for (i = 0; i < reply->elements; i++) {
+            element = replyToPyObject(self, reply->element[i]);
+            PyList_SET_ITEM(obj, i, element);
+        }
+        return obj;
+    }
     return NULL;
 }
 
