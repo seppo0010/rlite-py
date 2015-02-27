@@ -31,7 +31,7 @@ PyTypeObject hirlite_RliteType = {
     0,                            /*tp_setattro*/
     0,                            /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
-    "Hirlite protocol reader",    /*tp_doc */
+    "Hirlite",                    /*tp_doc */
     0,                            /*tp_traverse */
     0,                            /*tp_clear */
     0,                            /*tp_richcompare */
@@ -144,6 +144,16 @@ static PyObject *replyToPyObject(hirlite_RliteObject *self, rliteReply *reply) {
     }
     if (reply->type == RLITE_REPLY_INTEGER) {
         return PyLong_FromLongLong(reply->integer);
+    }
+    if (reply->type == RLITE_REPLY_ERROR) {
+        PyObject *obj;
+
+        PyObject *args = Py_BuildValue("(s#)", reply->str, reply->len);
+        assert(args != NULL);
+        obj = PyObject_CallObject(HIRLITE_STATE->HiErr_Base, args);
+        assert(obj != NULL);
+        Py_DECREF(args);
+        return obj;
     }
     return NULL;
 }

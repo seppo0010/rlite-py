@@ -20,3 +20,6 @@ class RliteTest(TestCase):
 
     def test_integer(self):
         self.assertEquals(2, self.rlite.command('lpush', 'list', 'value', 'other value'))
+
+    def test_error(self):
+        self.assertIsInstance(self.rlite.command('set', 'key'), hirlite.HirliteError)
