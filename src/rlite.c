@@ -3,8 +3,10 @@
 static void Rlite_dealloc(hirlite_RliteObject *self);
 static int Rlite_init(hirlite_RliteObject *self, PyObject *args, PyObject *kwds);
 static PyObject *Rlite_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+static PyObject *Rlite_command(hirlite_RliteObject *self, PyObject *args);
 
 static PyMethodDef hirlite_RliteMethods[] = {
+    {"command", (PyCFunction)Rlite_command, METH_VARARGS, NULL },
     { NULL }  /* Sentinel */
 };
 
@@ -68,7 +70,7 @@ static int Rlite_init(hirlite_RliteObject *self, PyObject *args, PyObject *kwds)
     if (encodingObj) {
         PyObject *encbytes;
         char *encstr;
-        int enclen;
+        Py_ssize_t enclen;
 
         if (PyUnicode_Check(encodingObj))
             encbytes = PyUnicode_AsASCIIString(encodingObj);
@@ -96,6 +98,100 @@ static PyObject *Rlite_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     self = (hirlite_RliteObject*)type->tp_alloc(type, 0);
     if (self != NULL) {
         self->encoding = NULL;
+        self->context = NULL;
     }
     return (PyObject*)self;
+}
+
+static PyObject *createDecodedString(hirlite_RliteObject *self, const char *str, size_t len) {
+    PyObject *obj;
+
+    if (self->encoding == NULL) {
+        obj = PyBytes_FromStringAndSize(str, len);
+    } else {
+        obj = PyUnicode_Decode(str, len, self->encoding, NULL);
+        if (obj == NULL) {
+            if (PyErr_ExceptionMatches(PyExc_ValueError)) {
+                /* Ignore encoding and simply return plain string. */
+                obj = PyBytes_FromStringAndSize(str, len);
+            } else {
+                assert(PyErr_ExceptionMatches(PyExc_LookupError));
+
+                /* Return Py_None as placeholder to let the error bubble up and
+                 * be used when a full reply in Reader#gets(). */
+                obj = Py_None;
+                Py_INCREF(obj);
+            }
+
+            PyErr_Clear();
+        }
+    }
+
+    assert(obj != NULL);
+    return obj;
+}
+static PyObject *replyToPyObject(hirlite_RliteObject *self, rliteReply *reply) {
+    if (reply->type == RLITE_REPLY_STATUS || reply->type == RLITE_REPLY_STRING) {
+        if (reply->type == RLITE_REPLY_STATUS && reply->len == 2 && memcmp(reply->str, "OK", 2) == 0) {
+            Py_INCREF(Py_True);
+            return Py_True;
+        }
+        return createDecodedString(self, reply->str, reply->len);
+    }
+    if (reply->type == RLITE_REPLY_NIL) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    return NULL;
+}
+
+static PyObject *Rlite_command(hirlite_RliteObject *self, PyObject *args) {
+    PyObject *object;
+    int i, argc;
+    char **argv;
+    size_t *argvlen;
+    PyObject *bytes;
+    char *str;
+    size_t len;
+    rliteReply *reply;
+
+    argc = (int)PyTuple_Size(args);
+    argv = malloc(sizeof(char *) * argc);
+    if (!argv)
+        return NULL;
+    argvlen = malloc(sizeof(size_t) * argc);
+    if (!argvlen) {
+        free(argv);
+        return NULL;
+    }
+
+    for (i = 0; i < argc; i++) {
+        object = PyTuple_GetItem(args, i);
+        if (PyUnicode_Check(object))
+            bytes = PyUnicode_AsASCIIString(object);
+        else
+            bytes = PyObject_Bytes(object);
+
+        if (bytes == NULL)
+            return NULL;
+
+        argvlen[i] = len = PyBytes_Size(bytes);
+        str = PyBytes_AsString(bytes);
+        argv[i] = (char*)malloc(len+1);
+        memcpy(argv[i], str, len);
+        argv[i][len] = '\0';
+        Py_DECREF(bytes);
+    }
+
+    reply = rliteCommandArgv(self->context, argc, argv, argvlen);
+    object = replyToPyObject(self, reply);
+
+    for (i = 0; i < argc; i++) {
+        free(argv[i]);
+    }
+    free(argv);
+    free(argvlen);
+    rliteFreeReplyObject(reply);
+
+    return object;
 }
