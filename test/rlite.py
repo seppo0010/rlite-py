@@ -17,3 +17,6 @@ class RliteTest(TestCase):
     def test_string(self):
         self.rlite.command('set', 'hello', 'world')
         self.assertEquals('world', self.rlite.command('get', 'hello'))
+
+    def test_integer(self):
+        self.assertEquals(2, self.rlite.command('lpush', 'list', 'value', 'other value'))

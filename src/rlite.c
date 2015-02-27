@@ -142,6 +142,9 @@ static PyObject *replyToPyObject(hirlite_RliteObject *self, rliteReply *reply) {
         Py_INCREF(Py_None);
         return Py_None;
     }
+    if (reply->type == RLITE_REPLY_INTEGER) {
+        return PyLong_FromLongLong(reply->integer);
+    }
     return NULL;
 }
 
