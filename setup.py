@@ -1,4 +1,4 @@
-from distutils.core import setup, Extension
+from setuptools import setup, Extension
 from distutils.command import install_lib as _install_lib
 import imp, glob
 
