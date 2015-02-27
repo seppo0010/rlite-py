@@ -1,0 +1,3 @@
+include src/*.h
+include vendor/rlite/src/*.h
+include vendor/rlite/deps/*.h
