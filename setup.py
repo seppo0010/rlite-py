@@ -57,7 +57,7 @@ setup (name='hirlite',
     cmdclass={ "install_lib": install_lib },
 
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Operating System :: MacOS',
