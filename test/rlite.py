@@ -1,7 +1,9 @@
 # coding=utf-8
 from unittest import *
-import hirlite
+import os.path
 import sys
+
+import hirlite
 
 
 class RliteTest(TestCase):
@@ -27,3 +29,20 @@ class RliteTest(TestCase):
     def test_array(self):
         self.rlite.command('rpush', 'mylist', '1', '2', '3')
         self.assertEquals(self.rlite.command('lrange', 'mylist', 0, -1), ['1', '2', '3'])
+
+
+class PersistentTest(TestCase):
+    PATH = 'rlite.rld'
+    def setUp(self):
+        if os.path.exists(PersistentTest.PATH):
+            os.unlink(PersistentTest.PATH)
+        self.rlite = hirlite.Rlite(PersistentTest.PATH)
+
+    def tearDown(self):
+        if os.path.exists(PersistentTest.PATH):
+            os.unlink(PersistentTest.PATH)
+
+    def test_write_close_open(self):
+        self.rlite.command('set', 'key', 'value')
+        self.rlite = hirlite.Rlite(PersistentTest.PATH)  # close db, open a new one
+        self.assertEquals('value', self.rlite.command('get', 'key'))
