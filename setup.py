@@ -35,7 +35,11 @@ class install_lib(_install_lib.install_lib):
 #
 # Also see: https://github.com/pietern/hiredis-py/issues/15
 lib = ("hirlite_for_hirlite_py", {
-  "sources": glob.glob("vendor/rlite/src/*.c") + glob.glob("vendor/rlite/deps/*.c")})
+  "include_dirs": ['vendor/rlite/deps/lua/src'],
+  "sources": (glob.glob("vendor/rlite/src/*.c") +
+      glob.glob("vendor/rlite/deps/*.c") +
+      glob.glob("vendor/rlite/deps/lua/src/*.c")
+      )})
 
 ext = Extension("hirlite.hirlite",
     sources=glob.glob("src/*.c"),
@@ -47,7 +51,7 @@ setup (name='hirlite',
     url="https://github.com/seppo0010/rlite-py",
     author="Sebastian Waisbrot",
     author_email="seppo0010@gmail.com",
-    keywords=["Redis", "Rlite"],
+    keywords=["Redis", "rlite"],
     license="BSD",
     packages=["hirlite"],
     libraries=[lib],
