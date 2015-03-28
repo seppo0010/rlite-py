@@ -42,3 +42,21 @@ True
 >>> rlite.command('get', 'key')
 'value'
 ```
+
+### Pubsub
+
+```python
+>>> subscriber = hirlite.hirlite.Rlite(path='mydb.rld')
+>>> subscriber.command('subscribe', 'channel', 'channel2')
+['subscribe', 'channel', 1L]
+>>> subscriber.command('__rlite_poll')
+['subscribe', 'channel2', 2L]
+>>> subscriber.command('__rlite_poll')
+>>> publisher = hirlite.hirlite.Rlite(path='mydb.rld')
+>>> publisher.command('publish', 'channel', 'hello world')
+1L
+>>> subscriber.command('__rlite_poll')
+['message', 'channel', 'hello world']
+>>> subscriber.command('__rlite_poll')
+>>>
+```
