@@ -8,9 +8,10 @@ path = glob.glob("build/lib*-%s/hirlite" % majorminor)[0]
 sys.path.insert(0, path)
 
 from unittest import *
-from . import rlite
+from . import rlite, persistent
 
 def tests():
   suite = TestSuite()
   suite.addTest(makeSuite(rlite.RliteTest))
+  suite.addTest(makeSuite(persistent.PersistentTest))
   return suite

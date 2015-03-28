@@ -1,3 +1,4 @@
 include src/*.h
 include vendor/rlite/src/*.h
+include vendor/rlite/src/rlite/*.h
 include vendor/rlite/deps/lua/src/*.h

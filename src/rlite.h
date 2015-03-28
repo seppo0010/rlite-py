@@ -2,7 +2,7 @@
 #define __RLITE_H
 
 #include "hirlite.h"
-#include <hirlite.h>
+#include <rlite/hirlite.h>
 
 typedef struct {
     PyObject_HEAD

@@ -35,8 +35,12 @@ class install_lib(_install_lib.install_lib):
 #
 # Also see: https://github.com/pietern/hiredis-py/issues/15
 lib = ("hirlite_for_hirlite_py", {
-  "include_dirs": ['vendor/rlite/deps/lua/src'],
-  "sources": (glob.glob("vendor/rlite/src/*.c") +
+  "include_dirs": [
+  'vendor/rlite/src',
+  'vendor/rlite/deps/lua/src'
+  ],
+  "sources": (
+      [f for f in glob.glob("vendor/rlite/src/*.c") if '_win' not in f] +
       glob.glob("vendor/rlite/deps/*.c") +
       glob.glob("vendor/rlite/deps/lua/src/*.c")
       )})
