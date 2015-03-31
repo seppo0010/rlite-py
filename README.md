@@ -15,7 +15,7 @@ $ pip install hirlite
 
 ```python
 >>> import hirlite
->>> rlite = hirlite.hirlite.Rlite()
+>>> rlite = hirlite.Rlite()
 >>> rlite.command('set', 'key', 'value')
 True
 >>> rlite.command('get', 'key')
@@ -25,7 +25,7 @@ True
 ### Unicode
 
 ```python
->>> rlite = hirlite.hirlite.Rlite(encoding='utf8')
+>>> rlite = hirlite.Rlite(encoding='utf8')
 >>> rlite.command('set', 'key', 'value')
 True
 >>> rlite.command('get', 'key')
@@ -35,10 +35,10 @@ u'value'
 ### Persistence
 
 ```python
->>> rlite = hirlite.hirlite.Rlite(path='mydb.rld')
+>>> rlite = hirlite.Rlite(path='mydb.rld')
 >>> rlite.command('set', 'key', 'value')
 True
->>> rlite = hirlite.hirlite.Rlite(path='mydb.rld')
+>>> rlite = hirlite.Rlite(path='mydb.rld')
 >>> rlite.command('get', 'key')
 'value'
 ```
@@ -46,13 +46,13 @@ True
 ### Pubsub
 
 ```python
->>> subscriber = hirlite.hirlite.Rlite(path='mydb.rld')
+>>> subscriber = hirlite.Rlite(path='mydb.rld')
 >>> subscriber.command('subscribe', 'channel', 'channel2')
 ['subscribe', 'channel', 1L]
 >>> subscriber.command('__rlite_poll')
 ['subscribe', 'channel2', 2L]
 >>> subscriber.command('__rlite_poll')
->>> publisher = hirlite.hirlite.Rlite(path='mydb.rld')
+>>> publisher = hirlite.Rlite(path='mydb.rld')
 >>> publisher.command('publish', 'channel', 'hello world')
 1L
 >>> subscriber.command('__rlite_poll')
