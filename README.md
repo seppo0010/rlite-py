@@ -1,6 +1,6 @@
 # rlite-py
 
-[![Build Status](https://travis-ci.org/seppo0010/rlite-py.svg?branch=master)](https://travis-ci.org/seppo0010/rlite-py)
+[![Build Status](https://travis-ci.org/seppo0010/rlite-py.svg?branch=master)](https://travis-ci.org/seppo0010/rlite-py) [![PyPI version](https://badge.fury.io/py/hirlite.svg)](http://badge.fury.io/py/hirlite)
 
 Python bindings for rlite. For more information about rlite, go to
 [rlite repository](https://github.com/seppo0010/rlite)
