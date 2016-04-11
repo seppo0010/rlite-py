@@ -8,4 +8,6 @@ __all__ = ["Rlite", "HirliteError", "__version__"]
 
 class Rlite(RliteExtension):
     def __getattr__(self, command):
+        if command == 'delete':
+            command = 'del'
         return functools.partial(self.command, command)
