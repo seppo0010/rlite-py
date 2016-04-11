@@ -39,3 +39,15 @@ class RliteTest(TestCase):
     def test_array(self):
         self.rlite.command('rpush', 'mylist', '1', '2', '3')
         self.assertEquals(self.rlite.command('lrange', 'mylist', '0', '-1'), [b'1', b'2', b'3'])
+
+    def test_getattr(self):
+        self.assertTrue(self.rlite.set('x', b'y'))
+        self.assertEqual(self.rlite.get('x'), b'y')
+        self.assertEqual(self.rlite.delete('x'), 1)
+        self.assertEqual(self.rlite.exists('x'), 0)
+
+    def test_getattr_err(self):
+        command = 'invalidcommand'
+        res = getattr(self.rlite, command)()
+        self.assertTrue(isinstance(res, hirlite.HirliteError))
+        self.assertEqual(res.args[0], "unknown command '%s'" % command)
