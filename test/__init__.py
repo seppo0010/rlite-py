@@ -1,17 +1,14 @@
-import glob, os.path, sys
+import unittest
+import sys
 
-version = sys.version.split(" ")[0]
-majorminor = version[0:3]
+# make sure hirlite isn't imported from source
+sys.path = sys.path[1:]
 
-# Add path to hiredis.so load path
-path = glob.glob("build/lib*-%s/hirlite" % majorminor)[0]
-sys.path.insert(0, path)
-
-from unittest import *
-from . import rlite, persistent
 
 def tests():
-  suite = TestSuite()
-  suite.addTest(makeSuite(rlite.RliteTest))
-  suite.addTest(makeSuite(persistent.PersistentTest))
-  return suite
+    from test import rlite, persistent
+
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(rlite.RliteTest))
+    suite.addTest(unittest.makeSuite(persistent.PersistentTest))
+    return suite

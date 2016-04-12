@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import functools
 
 from hirlite.hirlite import Rlite as RliteExtension, HirliteError
