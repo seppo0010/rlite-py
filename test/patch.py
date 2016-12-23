@@ -4,13 +4,18 @@ import os.path
 import sys
 
 import hirlite
-
 import redis
 
 
 class PatchConnTest(TestCase):
     def setUp(self):
+        self.orig_conn = redis.connection.Connection
         hirlite.patch_connection()
+        self.assertNotEquals(self.orig_conn, redis.connection.Connection)
+
+    def tearDown(self):
+        hirlite.unpatch_connection()
+        self.assertEquals(self.orig_conn, redis.connection.Connection)
 
     def test_basic(self):
         r = redis.StrictRedis()
@@ -66,3 +71,11 @@ class PatchConnTest(TestCase):
         self.assertEquals(set(['zset', 'hset']), set(res))
 
 
+class PatchContextManagerTest(TestCase):
+    def test_contextmanager(self):
+        orig_conn = redis.connection.Connection
+
+        with hirlite.patch():
+            self.assertNotEquals(orig_conn, redis.connection.Connection)
+
+        self.assertEquals(orig_conn, redis.connection.Connection)

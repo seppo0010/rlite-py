@@ -1,4 +1,5 @@
 import hirlite
+from contextlib import contextmanager
 
 try:
     import redis
@@ -12,8 +13,12 @@ except ImportError:
 
 try:
     from queue import Queue
-except:
+except ImportError:
     from Queue import Queue
+
+
+# ============================================================================
+orig_classes = None
 
 
 # ============================================================================
@@ -42,7 +47,6 @@ class RliteConnection(Connection):
         return True
 
     def send_command(self, *args):
-        #print(args)
         args = [self.encode(arg) for arg in args]
 
         # implement SCAN via a KEYS call as rlite does not
@@ -58,7 +62,6 @@ class RliteConnection(Connection):
             print(result)
             raise result
         else:
-            #print(result)
             self.q.put(result)
 
     def pack_commands(self, *args):
@@ -106,15 +109,49 @@ def patch_connection(filename=':memory:'):
     """
 
     if no_redis:
-        print("redis package not found, please install redis-py via 'pip install redis'")
-        return
+        raise Exception("redis package not found, please install redis-py via 'pip install redis'")
 
     RliteConnection.set_file(filename)
 
-    redis.connection.Connection = RliteConnection
-    redis.Connection = RliteConnection
+    global orig_classes
 
-    redis.connection.ConnectionPool = RliteConnectionPool
-    redis.client.ConnectionPool = RliteConnectionPool
-    redis.ConnectionPool = RliteConnectionPool
+    # already patched
+    if orig_classes:
+        return
 
+    orig_classes = (redis.connection.Connection,
+                    redis.connection.ConnectionPool)
+
+    _set_classes(RliteConnection, RliteConnectionPool)
+
+
+# ============================================================================
+def unpatch_connection():
+    global orig_classes
+
+    if not orig_classes:
+        return
+
+    _set_classes(*orig_classes)
+    orig_classes = None
+
+
+# ============================================================================
+@contextmanager
+def patch(filename=':memory:'):
+    """
+    Context manager version of patch_connection/unpatch_connection
+    """
+    patch_connection(filename)
+    yield
+    unpatch_connection()
+
+
+# ============================================================================
+def _set_classes(conn_class, pool_class):
+    redis.connection.Connection = conn_class
+    redis.Connection = conn_class
+
+    redis.connection.ConnectionPool = pool_class
+    redis.client.ConnectionPool = pool_class
+    redis.ConnectionPool = pool_class

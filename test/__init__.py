@@ -15,6 +15,7 @@ def tests():
     try:
         from test import patch
         suite.addTest(unittest.makeSuite(patch.PatchConnTest))
+        suite.addTest(unittest.makeSuite(patch.PatchContextManagerTest))
     except ImportError:
         pass
 
