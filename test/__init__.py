@@ -11,4 +11,12 @@ def tests():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(rlite.RliteTest))
     suite.addTest(unittest.makeSuite(persistent.PersistentTest))
+
+    try:
+        from test import patch
+        suite.addTest(unittest.makeSuite(patch.PatchConnTest))
+        suite.addTest(unittest.makeSuite(patch.PatchContextManagerTest))
+    except ImportError:
+        pass
+
     return suite
