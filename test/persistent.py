@@ -14,6 +14,7 @@ class PersistentTest(TestCase):
         self.rlite = hirlite.Rlite(PersistentTest.PATH)
 
     def tearDown(self):
+        self.rlite = None
         if os.path.exists(PersistentTest.PATH):
             os.unlink(PersistentTest.PATH)
 
