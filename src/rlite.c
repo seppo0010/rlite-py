@@ -52,6 +52,7 @@ PyTypeObject hirlite_RliteType = {
 };
 
 static void Rlite_dealloc(hirlite_RliteObject *self) {
+    rliteFree(self->context);
     // rliteReplyRliteFree(self->reader);
     if (self->encoding)
         free(self->encoding);
