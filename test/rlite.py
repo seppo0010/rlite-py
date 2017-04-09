@@ -16,6 +16,21 @@ class RliteTest(TestCase):
         self.rlite = hirlite.Rlite(encoding='utf8')
         self.assertEquals(snowman.decode('utf-8'), self.rlite.command('ping', snowman))
 
+    def test_encoding_arg(self):
+        text = u'héllo'
+        self.rlite = hirlite.Rlite(encoding='utf8')
+        self.assertEquals(text, self.rlite.command('ping', text))
+
+    def test_encoding_arg2(self):
+        text = 'héllo'
+        self.rlite = hirlite.Rlite(encoding='utf8')
+        self.assertEquals(u'héllo', self.rlite.command('ping', text))
+
+    def test_encoding_arg3(self):
+        text = 'héllo'
+        self.rlite = hirlite.Rlite()
+        self.assertEquals(text, self.rlite.command('ping', text))
+
     def test_none(self):
         self.assertEquals(None, self.rlite.command('get', 'hello'))
 
