@@ -13,7 +13,7 @@ env:
   - "REDIS_PATCH=false"
 
 install:
-  - "if [ $REDIS_PATCH == true ]; then pip install redis; fi"
+  - "if [ $REDIS_PATCH == true ]; then pip install redis==2.10.5; fi"
   - "python setup.py install"
 
 script: "python test.py"
