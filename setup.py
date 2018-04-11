@@ -49,6 +49,18 @@ ext = Extension("hirlite.hirlite",
     sources=glob.glob("src/*.c"),
     include_dirs=["vendor/rlite/src"])
 
+
+# By default distutils sets the `GNU_SOURCE` flag which causes the GNU
+# implementation of `strerror_r` to be made available (at least on CentOS),
+# instead of the POSIX version that rlite expects (which returns `int` instead
+# of `char *`). We monkey patch distutils default flags here so that we get a
+# proper POSIX environment to compile rlite
+import distutils.sysconfig
+cflags = distutils.sysconfig.get_config_var('CFLAGS')
+distutils.sysconfig._config_vars['CFLAGS'] = cflags.replace(
+    ' -D_GNU_SOURCE', ''
+)
+
 setup (name='hirlite',
     version=version(),
     description='Python wrapper for rlite',
